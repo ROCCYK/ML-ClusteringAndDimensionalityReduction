@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html><head></head><body style="color: rgb(32, 33, 34); font-family: undefined;"><pre class="line-numbers d2l-code"><code class="language-javascript">import numpy as np
+import pandas as pd
+from scipy.stats import chi2_contingency
+
+# Load the Iris dataset
+from sklearn.datasets import load_iris
+iris = load_iris()
+df = pd.DataFrame(iris.data, columns=iris.feature_names)
+df['species'] = iris.target_names[iris.target]
+
+for feature_name in iris.feature_names:
+  print(feature_name)
+  feature_values = df[feature_name]
+
+  # Create a contingency table
+  contingency_table = pd.crosstab(feature_values, df['species'])
+
+  # Perform Chi-Squared test
+  chi2, p, _, _ = chi2_contingency(contingency_table)
+
+  # Degrees of freedom
+  degrees_of_freedom = (contingency_table.shape[0] - 1) * (contingency_table.shape[1] - 1)
+
+  # Print results
+  #print(f"Contingency Table:\n{contingency_table}\n")
+  print(f"\tChi-Squared Statistic: {chi2}")
+  print(f"\tP-value: {p}")
+  print(f"\tDegrees of Freedom: {degrees_of_freedom}")
+</code></pre></body></html>

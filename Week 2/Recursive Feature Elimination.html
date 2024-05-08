@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html><head></head><body style="color: rgb(32, 33, 34); font-family: undefined;"><p><code></code>Code</p>
+<p></p>
+<pre class="line-numbers d2l-code"><code class="language-python">from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import load_iris
+import pandas as pd
+import numpy as np
+import warnings
+
+# Load the Iris dataset
+iris = load_iris()
+X = pd.DataFrame(iris.data, columns=iris.feature_names)
+y = iris.target
+
+# Set the desired number of features to select
+num_features_to_select = 2
+
+# Initialize a list to store AIC values
+aic_values = []
+
+# Initialize a list to store selected feature names
+selected_feature_names = []
+
+# Create a logistic regression model
+model = LogisticRegression(max_iter=1000)
+
+# Continue the recursive process
+for _ in range(num_features_to_select):
+    # Store the name of the selected feature
+    selected_feature_names.append(X.columns)
+
+    # Fit logistic regression model on the current set of features
+    model.fit(X, y)
+
+    # Calculate AIC for the current model
+    aic = -2 * model.score(X, y) + 2 * (X.shape[1] + 1)
+    aic_values.append(aic)
+
+    # Get absolute coefficients
+    absolute_coefficients = abs(model.coef_[0])
+
+    # Find the index of the least important feature
+    least_important_index = np.argmin(absolute_coefficients)
+
+    # Remove the least important feature from the dataset
+    removed_feature = X.columns[least_important_index]
+    X = X.drop(removed_feature, axis=1)
+
+# Fit the final logistic regression model on the selected features
+final_model = LogisticRegression(max_iter=100)
+final_model.fit(X, y)
+
+# Display the selected features and AIC values for each model
+print("Selected Features and AIC Values:")
+for i, (feature, aic) in enumerate(zip(selected_feature_names, aic_values)):
+    print(f"Iteration {i + 1}: Feature: {feature}, AIC: {aic}")
+
+# Display AIC for the final model
+final_aic = -2 * final_model.score(X, y) + 2 * (X.shape[1] + 1)
+print(f"Final features: {X.columns}")
+print(f"Final Model AIC: {final_aic}")
+</code></pre></body></html>
